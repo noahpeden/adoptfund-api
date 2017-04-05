@@ -42,8 +42,8 @@ app.get('/api/v1/comments', (request, response) => {
   })
 })
 
-app.get('/api/v1/favorites', (request, response) => {
-  database('favorites').select()
+app.get('/api/v1/family', (request, response) => {
+  database('family').select()
   .then((comments) => {
     response.status(200).json(comments)
   })
@@ -52,8 +52,8 @@ app.get('/api/v1/favorites', (request, response) => {
   })
 })
 
-app.get('/api/v1/accessTokens', (request, response) => {
-  database('accessTokens').select()
+app.get('/api/v1/donor', (request, response) => {
+  database('donor').select()
   .then((comments) => {
     response.status(200).json(comments)
   })
@@ -63,11 +63,11 @@ app.get('/api/v1/accessTokens', (request, response) => {
 })
 
 //QUERY PARAM ?userId=5
-app.get('/api/v1/favorites', (request, response) => {
+app.get('/api/v1/family', (request, response) => {
   const { userId } = request.query
-  database('favorites').where('userId', userId).select()
-  .then((favorites) => {
-    response.status(200).json(favorites)
+  database('family').where('userId', userId).select()
+  .then((family) => {
+    response.status(200).json(family)
   })
   .catch((error) => {
     response.status(404).json({'Response 404': 'Not Found'})
@@ -104,14 +104,14 @@ app.post('/api/v1/comments', (request, response) => {
   })
 })
 
-app.post('/api/v1/favorites', (request, response) => {
+app.post('/api/v1/family', (request, response) => {
   const { rating, songKickVenueId, userId } = request.body
   const favorite = { rating, songKickVenueId, userId }
-  database('favorites').insert(favorite)
+  database('family').insert(favorite)
   .then(function() {
-    database('favorites').select()
-      .then(function(favorites) {
-        response.status(201).json(favorites)
+    database('family').select()
+      .then(function(family) {
+        response.status(201).json(family)
       })
       .catch(function(error) {
         response.status(422).json({'Response 422': 'Unprocessable Entity'})
@@ -166,9 +166,9 @@ app.delete('/api/v1/comments/:id', (request, response)=> {
     })
 })
 
-app.delete('/api/v1/favorites/:id', (request, response)=> {
+app.delete('/api/v1/family/:id', (request, response)=> {
   const { id } = request.params
-    database('favorites').where('id', id).select().del()
+    database('family').where('id', id).select().del()
     .then(function(count) {
       if (count === 0) {
         response.status(422).json({'Response 422': 'Unprocessable Entity'})
@@ -208,13 +208,13 @@ app.patch('/api/v1/comments/:id', (request, response)=> {
   })
 })
 
-app.patch('/api/v1/favorites/:id', (request, response)=> {
+app.patch('/api/v1/family/:id', (request, response)=> {
   const { id } = request.params
   const { rating } = request.body
-  database('favorites').where('id', id).select()
+  database('family').where('id', id).select()
     .then((favorite)=> {
-      database('favorites').where('id', id).select().update({ rating })
-      .then(function(favorites) {
+      database('family').where('id', id).select().update({ rating })
+      .then(function(family) {
         response.status(201).json({success: 'true'})
       })
       .catch(function(error) {
