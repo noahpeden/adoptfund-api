@@ -128,10 +128,10 @@ describe('GET /api/v1/favorites', () => {
   });
 });
 
-describe('GET /api/v1/accessTokens', () => {
-  it('should respond back with all accessTokens', (done) => {
+describe('GET /api/v1/donor', () => {
+  it('should respond back with all donor', (done) => {
     chai.request(server)
-    .get('/api/v1/accessTokens')
+    .get('/api/v1/donor')
     .end((err, res) => {
       if(err) {done(err) }
       expect(res).to.have.status(200);
@@ -144,10 +144,10 @@ describe('GET /api/v1/accessTokens', () => {
 });
 
  //SAD PATH
-describe('GET /api/v1/accessTokens', () => {
+describe('GET /api/v1/donor', () => {
   it('should respond back with a 404 error', (done) => {
     chai.request(server)
-    .get('/api/v1/accessTokenss')
+    .get('/api/v1/donors')
     .end((err, res) => {
       expect(res).to.have.status(404);
       done();
@@ -277,11 +277,11 @@ describe('POST /api/v1/comments/:userId/:venueId', function() {
 });
 
 //SAD PATH
- describe('POST /api/v1/accessTokens', function() {
+ describe('POST /api/v1/donor', function() {
      it('should respond with a 404', function(done) {
        let token = {token:'token fun'}
        chai.request(server)
-       .post('/api/v1/accessTokenss')
+       .post('/api/v1/donors')
        .send(token)
        .end((err, res) => {
        expect(res).to.have.status(404);

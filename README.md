@@ -54,5 +54,5 @@ PATCH /api/v1/favorites/:id
 
 ### Access Tokens
 
-GET /api/v1/accessTokens
+GET /api/v1/donor
 * Fetch all access tokens
