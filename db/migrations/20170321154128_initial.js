@@ -2,48 +2,60 @@ exports.up = function(knex, Promise) {
     return Promise.all([
         knex.schema.createTable('users', function(table) {
             table.increments('id').primary();
+            table.string('firstName');
+            table.string('lastName');
             table.string('email');
             table.string('password');
 
             table.timestamps();
         }),
+        knex.schema.createTable('family', function(table){
+          table.increments('id').primary();
+          table.timestamp('expiration');
+          table.string('location');
+          table.string('title');
+          table.text('story');
+          table.string('links');
+          table.string('image');
+          table.string('expenseDescription')
+          table.string('cost')
+            table.integer('userId')
+                 .references('id')
+                 .inTable('users');
+        }),
+        knex.schema.createTable('donor', function(table){
+          table.increments('id').primary();
+          table.string('donationAmount')
+            table.integer('userId')
+                 .references('id')
+                 .inTable('users');
+            table.integer('familyId')
+                 .references('id')
+                 .inTable('family');
 
+          table.timestamps();
+
+        }),
         knex.schema.createTable('comments', function(table){
             table.increments('id').primary();
             table.string('body');
-            table.string('songKickVenueId')
             table.integer('userId')
                  .references('id')
                  .inTable('users');
+            table.integer('familyId')
+                 .references('id')
+                 .inTable('family');
 
             table.timestamps();
         }),
-
-        knex.schema.createTable('favorites', function(table){
-          table.increments('id').primary();
-          table.string('songKickVenueId');
-          table.integer('rating');
-            table.integer('userId')
-                 .references('id')
-                 .inTable('users');
-        }),
-        knex.schema.createTable('accessTokens', function(table){
-          table.increments('id').primary();
-          table.string('refreshToken');
-          table.string('accessToken');
-          table.timestamp('expiration');
-            table.integer('userId')
-                 .references('id')
-                 .inTable('users');
-        })
     ])
 };
 
 exports.down = function(knex, Promise) {
     return Promise.all([
-      knex.schema.dropTable('accessTokens'),
-      knex.schema.dropTable('favorites'),
       knex.schema.dropTable('comments'),
+      knex.schema.dropTable('donor'),
+      knex.schema.dropTable('family'),
       knex.schema.dropTable('users')
     ])
 };

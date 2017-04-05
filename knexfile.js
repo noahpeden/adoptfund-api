@@ -1,7 +1,7 @@
 module.exports = {
   development: {
     client: 'pg',
-    connection:'postgres://localhost/build-a-backend',
+    connection:'postgres://localhost/adoptfund',
     migrations: {
       directory: './db/migrations'
     },
@@ -13,7 +13,7 @@ module.exports = {
 
   test: {
     client: 'pg',
-    connection:'postgres://localhost/build-a-backend-tests',
+    connection:'postgres://localhost/adoptfund' ,
     migrations: {
       directory: './db/migrations'
     },
