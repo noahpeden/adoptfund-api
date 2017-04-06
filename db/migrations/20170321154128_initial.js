@@ -23,7 +23,7 @@ exports.up = function(knex, Promise) {
                  .references('id')
                  .inTable('users');
         }),
-        knex.schema.createTable('donor', function(table){
+        knex.schema.createTable('donation', function(table){
           table.increments('id').primary();
           table.string('donationAmount')
             table.integer('userId')
