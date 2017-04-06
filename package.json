@@ -11,16 +11,17 @@
   },
   "author": "chelle tuerk",
   "license": "ISC",
-    "devDependencies": {
+  "devDependencies": {
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.8",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
     "eslint": "^3.17.1",
-
     "jquery": "^3.1.1",
     "mocha": "^3.2.0",
     "mocha-loader": "^1.0.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
     "selenium-webdriver": "^3.0.1",
     "url-loader": "^0.5.7"
   },
