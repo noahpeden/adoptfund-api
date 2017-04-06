@@ -18,7 +18,6 @@ exports.up = function(knex, Promise) {
           table.text('story');
           table.string('links');
           table.string('image');
-          table.string('expenseDescription')
           table.string('cost')
             table.integer('userId')
                  .references('id')

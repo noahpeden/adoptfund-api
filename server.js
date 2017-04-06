@@ -187,6 +187,17 @@ app.delete('/api/v1/users/:id', (request, response)=> {
       }
     })
 })
+app.delete('/api/v1/donation/:id', (request, response)=> {
+  const { id } = request.params
+    database('donation').where('id', id).select().del()
+    .then(function(count) {
+      if (count === 0) {
+        response.status(422).json({'Response 422': 'Unprocessable Entity'})
+      } else {
+        response.status(200).json({'Response 200': 'OK' })
+      }
+    })
+})
 
 app.delete('/api/v1/comments/:id', (request, response)=> {
   const { id } = request.params
@@ -241,13 +252,28 @@ app.patch('/api/v1/comments/:id', (request, response)=> {
       })
   })
 })
+app.patch('/api/v1/donation/:id', (request, response)=> {
+  const { id } = request.params
+  const { donationAmount } = request.body
+  database('donation').where('id', id).select()
+    .then((donation)=> {
+      database('donation').where('id', id).select().update({ donationAmount })
+      .then(function(donation) {
+        response.status(201).json(donation)
+      })
+      .catch(function(error) {
+        response.status(422).json({success: 'false'})
+      })
+  })
+})
 
 app.patch('/api/v1/family/:id', (request, response)=> {
   const { id } = request.params
-  const { rating } = request.body
+  const { expiration, location, name, title, story, links, image, cost } = request.body
+  const family = { expiration, location, name, title, story, links, image, cost }
   database('family').where('id', id).select()
     .then((favorite)=> {
-      database('family').where('id', id).select().update({ rating })
+      database('family').where('id', id).select(family).update(family)
       .then(function(family) {
         response.status(201).json({success: 'true'})
       })
