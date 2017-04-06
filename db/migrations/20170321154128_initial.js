@@ -13,6 +13,7 @@ exports.up = function(knex, Promise) {
           table.increments('id').primary();
           table.timestamp('expiration');
           table.string('location');
+          table.string('name');
           table.string('title');
           table.text('story');
           table.string('links');

@@ -2,25 +2,18 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const fs = require('fs')
+const passport = require('passport')
+const LocalStrategy = require('passport-local').Strategy
 
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
-
-
-
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
 
 app.set('port', process.env.PORT || 3000)
-
-app.get('/', (request, response) => {
-  fs.readFile(`${__dirname}/index.html`, (err, file) => {
-    response.send(file)
-  })
-})
 
 app.get('/api/v1/users', (request, response) => {
   database('users').select()
@@ -32,8 +25,10 @@ app.get('/api/v1/users', (request, response) => {
   })
 })
 
-app.get('/api/v1/comments', (request, response) => {
-  database('comments').select()
+app.get('/api/v1/comments/:familyId', (request, response) => {
+  const {familyId} = req.params
+
+  database('comments').where('familyId', familyId).select()
   .then((comments) => {
     response.status(200).json(comments)
   })
@@ -42,8 +37,10 @@ app.get('/api/v1/comments', (request, response) => {
   })
 })
 
-app.get('/api/v1/family', (request, response) => {
-  database('family').select()
+app.get('/api/v1/family/:number', (request, response) => {
+  const {number} = req.params
+
+  database('family').limit(number).select()
   .then((comments) => {
     response.status(200).json(comments)
   })
@@ -52,10 +49,24 @@ app.get('/api/v1/family', (request, response) => {
   })
 })
 
-app.get('/api/v1/donor', (request, response) => {
-  database('donor').select()
-  .then((comments) => {
-    response.status(200).json(comments)
+app.get('/api/v1/family/:familyName', (request, response) => {
+  const {familyName} = req.params
+
+  database('family').where('name', familyName).select()
+  .then((family) => {
+    response.status(200).json(family)
+  })
+  .catch((error) => {
+    response.status(404).json({'Response 404': 'Not Found'})
+  })
+})
+
+app.get('/api/v1/donation/:familyId', (request, response) => {
+  const {familyId} = req.params
+
+  database('donation').where('familyId', familyId).select()
+  .then((donations) => {
+    response.status(200).json(donations)
   })
   .catch((error) => {
     response.status(404).json({'Response 404': 'Not Found'})
@@ -77,6 +88,7 @@ app.get('/api/v1/family', (request, response) => {
 app.post('/api/v1/users', (request, response) => {
   const { email, password } = request.body
   const user = { email, password }
+
   database('users').insert(user)
   .then(function() {
     database('users').select()
@@ -105,10 +117,31 @@ app.post('/api/v1/comments', (request, response) => {
 })
 
 app.post('/api/v1/family', (request, response) => {
-  const { rating, songKickVenueId, userId } = request.body
-  const favorite = { rating, songKickVenueId, userId }
-  database('family').insert(favorite)
-  .then(function() {
+  const {
+    expiration,
+    location,
+    title,
+    story,
+    links,
+    image,
+    expenseDescription,
+    cost,
+    userId
+  } = request.body
+
+  const family = {
+    expiration,
+    location,
+    title,
+    story,
+    links,
+    image,
+    expenseDescription,
+    cost,
+    userId
+  }
+  database('family').insert(family)
+  .then(() => {
     database('family').select()
       .then(function(family) {
         response.status(201).json(family)
@@ -119,22 +152,23 @@ app.post('/api/v1/family', (request, response) => {
   })
 })
 
-app.post('/api/v1/comments/:userId/:venueId', (request, response) => {
-  const { userId, venueId } = request.params
-  const { body, songKickVenueId } = request.body
-  const newComment = {
-    body,
+app.post('/api/v1/donation', (request, response) => {
+  const {
+    donationAmount,
     userId,
-    songKickVenueId:venueId,
-    created_at: new Date,
-    updated_at: new Date,
-  }
+    familyId
+  } = request.body
 
-  database('comments').insert(newComment)
+  const donation = {
+    donationAmount,
+    userId,
+    familyId
+  }
+  database('donation').insert(donation)
   .then(()=> {
-    database('comments').where('userId', userId).select()
-    .then(function(comments) {
-      response.status(201).json(comments)
+    database('donation').select()
+    .then(function(donations) {
+      response.status(201).json(donations)
     })
     .catch(function(error) {
       response.status(422).json({'Response 422': 'Unprocessable Entity'})
