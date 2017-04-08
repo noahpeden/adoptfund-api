@@ -256,6 +256,7 @@ app.patch('/api/v1/family/:id', (request, response)=> {
     image,
     cost
   } = request.body
+
   const family = {
     expiration,
     location,
