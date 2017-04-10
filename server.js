@@ -50,7 +50,7 @@ app.get('/api/v1/family', (request, response) => {
 
 
 app.get('/api/v1/family/:familyName', (request, response) => {
-  const {familyName} = req.params
+  const {familyName} = request.params
 
   database('family').where('name', familyName).select()
   .then((family) => {

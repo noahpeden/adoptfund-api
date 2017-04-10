@@ -54,7 +54,7 @@ exports.up = function(knex, Promise) {
 exports.down = function(knex, Promise) {
     return Promise.all([
       knex.schema.dropTable('comments'),
-      knex.schema.dropTable('donor'),
+      knex.schema.dropTable('donation'),
       knex.schema.dropTable('family'),
       knex.schema.dropTable('users')
     ])
