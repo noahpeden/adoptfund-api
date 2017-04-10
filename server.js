@@ -26,7 +26,7 @@ app.get('/api/v1/users', (request, response) => {
 })
 
 app.get('/api/v1/comments/:familyId', (request, response) => {
-  const {familyId} = req.params
+  const {familyId} = request.params
 
   database('comments').where('familyId', familyId).select()
   .then((comments) => {
@@ -37,10 +37,9 @@ app.get('/api/v1/comments/:familyId', (request, response) => {
   })
 })
 
-app.get('/api/v1/family/:number', (request, response) => {
-  const {number} = req.params
-
-  database('family').limit(number).select()
+// this gets the NUMBER of families requested back
+app.get('/api/v1/family', (request, response) => {
+  database('family').select()
   .then((comments) => {
     response.status(200).json(comments)
   })
@@ -48,6 +47,7 @@ app.get('/api/v1/family/:number', (request, response) => {
     response.status(404).json({'Response 404': 'Not Found'})
   })
 })
+
 
 app.get('/api/v1/family/:familyName', (request, response) => {
   const {familyName} = req.params
@@ -75,8 +75,8 @@ app.get('/api/v1/donation/:familyId', (request, response) => {
 
 //QUERY PARAM ?userId=5
 app.get('/api/v1/family', (request, response) => {
-  const { userId } = request.query
-  database('family').where('userId', userId).select()
+  const { limit } = request.query
+  database('family').limit(limit).select()
   .then((family) => {
     response.status(200).json(family)
   })
@@ -284,7 +284,7 @@ app.patch('/api/v1/family/:id', (request, response)=> {
 })
 
 app.listen(app.get('port'), () => {
-  console.log(`${app.locals.title} is running on ${app.get('port')}.`)
+  console.log(`This thing is running on ${app.get('port')}.`)
 })
 
 module.exports = app;
