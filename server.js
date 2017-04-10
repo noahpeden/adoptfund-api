@@ -271,19 +271,39 @@ app.patch('/api/v1/donation/:id', (request, response)=> {
 
 app.patch('/api/v1/family/:id', (request, response)=> {
   const { id } = request.params
-  const { expiration, location, name, title, story, links, image, cost } = request.body
-  const family = { expiration, location, name, title, story, links, image, cost }
-  database('family').where('id', id).select()
-    .then((favorite)=> {
-      database('family').where('id', id).select(family).update(family)
-      .then(function(family) {
-        response.status(201).json({success: 'true'})
-      })
-      .catch(function(error) {
-        response.status(422).json({success: 'false'})
-      })
+  const {
+    expiration,
+    location,
+    name,
+    title,
+    story,
+    links,
+    story,
+    links,
+    image,
+    cost
+  } = request.body
+
+  const family = {
+    expiration,
+    location,
+    name,
+    title,
+    story,
+    links,
+    story,
+    links,
+    image,
+    cost
+  }
+    database('family').where('id', id).select().update({ family })
+    .then(function(family) {
+      response.status(201).json({success: 'true'})
+    })
+    .catch(function(error) {
+      response.status(422).json({success: 'false'})
+    })
   })
-})
 
 app.listen(app.get('port'), () => {
   console.log(`This thing is running on ${app.get('port')}.`)
