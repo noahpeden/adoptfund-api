@@ -276,10 +276,8 @@ app.patch('/api/v1/family/:id', (request, response)=> {
     location,
     name,
     title,
-    story,
     links,
     story,
-    links,
     image,
     cost
   } = request.body
@@ -289,10 +287,8 @@ app.patch('/api/v1/family/:id', (request, response)=> {
     location,
     name,
     title,
-    story,
     links,
     story,
-    links,
     image,
     cost
   }
