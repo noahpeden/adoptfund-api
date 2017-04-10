@@ -62,7 +62,7 @@ app.get('/api/v1/family/:familyName', (request, response) => {
 })
 
 app.get('/api/v1/donation/:familyId', (request, response) => {
-  const {familyId} = req.params
+  const {familyId} = request.params
 
   database('donation').where('familyId', familyId).select()
   .then((donations) => {
@@ -86,14 +86,14 @@ app.get('/api/v1/family', (request, response) => {
 })
 
 app.post('/api/v1/users', (request, response) => {
-  const { email, password } = request.body
-  const user = { email, password }
+  const { email, password, firstName, lastName } = request.body
+  const user = { email, password, firstName, lastName }
 
   database('users').insert(user)
   .then(function() {
-    database('users').select()
-      .then(function(users) {
-        response.status(201).json(users)
+    database('users').where('email', email).select()
+      .then(function(user) {
+        response.status(201).json(user)
       })
       .catch(function(error) {
         response.status(422).json({'Response 422': 'Unprocessable Entity'})
@@ -102,11 +102,11 @@ app.post('/api/v1/users', (request, response) => {
 })
 
 app.post('/api/v1/comments', (request, response) => {
-  const { body, songKickVenueId, userId } = request.body
-  const comment = { body, songKickVenueId, userId }
+  const { body, familyId, userId } = request.body
+  const comment = { body, familyId, userId }
   database('comments').insert(comment)
   .then(function() {
-    database('comments').select()
+    database('comments').where('familyId', familyId).select()
       .then(function(comments) {
         response.status(201).json(comments)
       })
@@ -120,11 +120,11 @@ app.post('/api/v1/family', (request, response) => {
   const {
     expiration,
     location,
+    name,
     title,
     story,
     links,
     image,
-    expenseDescription,
     cost,
     userId
   } = request.body
@@ -132,17 +132,19 @@ app.post('/api/v1/family', (request, response) => {
   const family = {
     expiration,
     location,
+    name,
     title,
     story,
     links,
     image,
-    expenseDescription,
     cost,
     userId
   }
   database('family').insert(family)
-  .then(() => {
-    database('family').select()
+  .returning('id')
+  .then((id) => {
+    const firstId = id[0]
+    database('family').where('id', firstId).select()
       .then(function(family) {
         response.status(201).json(family)
       })
@@ -152,29 +154,29 @@ app.post('/api/v1/family', (request, response) => {
   })
 })
 
-app.post('/api/v1/donation', (request, response) => {
-  const {
-    donationAmount,
-    userId,
-    familyId
-  } = request.body
-
-  const donation = {
-    donationAmount,
-    userId,
-    familyId
-  }
-  database('donation').insert(donation)
-  .then(()=> {
-    database('donation').select()
-    .then(function(donations) {
-      response.status(201).json(donations)
-    })
-    .catch(function(error) {
-      response.status(422).json({'Response 422': 'Unprocessable Entity'})
-    });
-  })
-})
+// app.post('/api/v1/donation', (request, response) => {
+//   const {
+//     donationAmount,
+//     userId,
+//     familyId
+//   } = request.body
+//
+//   const donation = {
+//     donationAmount,
+//     userId,
+//     familyId
+//   }
+//   database('donation').insert(donation)
+//   .then(()=> {
+//     database('donation').where('familyId', familyId).select()
+//     .then(function(donations) {
+//       response.status(201).json(donations)
+//     })
+//     .catch(function(error) {
+//       response.status(422).json({'Response 422': 'Unprocessable Entity'})
+//     });
+//   })
+// })
 
 app.delete('/api/v1/users/:id', (request, response)=> {
   const { id } = request.params

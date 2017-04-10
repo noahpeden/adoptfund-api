@@ -11,7 +11,7 @@ exports.up = function(knex, Promise) {
         }),
         knex.schema.createTable('family', function(table){
           table.increments('id').primary();
-          table.timestamp('expiration');
+          table.string('expiration');
           table.string('location');
           table.string('name');
           table.string('title');
