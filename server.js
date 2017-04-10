@@ -38,7 +38,7 @@ app.get('/api/v1/comments/:familyId', (request, response) => {
 })
 
 // this gets the NUMBER of families requested back
-app.get('/api/v1/family', (request, response) => {
+app.get('/api/v1/family/all', (request, response) => {
   database('family').select()
   .then((comments) => {
     response.status(200).json(comments)
@@ -154,29 +154,29 @@ app.post('/api/v1/family', (request, response) => {
   })
 })
 
-// app.post('/api/v1/donation', (request, response) => {
-//   const {
-//     donationAmount,
-//     userId,
-//     familyId
-//   } = request.body
-//
-//   const donation = {
-//     donationAmount,
-//     userId,
-//     familyId
-//   }
-//   database('donation').insert(donation)
-//   .then(()=> {
-//     database('donation').where('familyId', familyId).select()
-//     .then(function(donations) {
-//       response.status(201).json(donations)
-//     })
-//     .catch(function(error) {
-//       response.status(422).json({'Response 422': 'Unprocessable Entity'})
-//     });
-//   })
-// })
+app.post('/api/v1/donation', (request, response) => {
+  const {
+    donationAmount,
+    userId,
+    familyId
+  } = request.body
+
+  const donation = {
+    donationAmount,
+    userId,
+    familyId
+  }
+  database('donation').insert(donation)
+  .then(()=> {
+    database('donation').where('familyId', familyId).select()
+    .then(function(donations) {
+      response.status(201).json(donations)
+    })
+    .catch(function(error) {
+      response.status(422).json({'Response 422': 'Unprocessable Entity'})
+    });
+  })
+})
 
 app.delete('/api/v1/users/:id', (request, response)=> {
   const { id } = request.params
