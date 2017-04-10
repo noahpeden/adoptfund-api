@@ -11,14 +11,13 @@ exports.up = function(knex, Promise) {
         }),
         knex.schema.createTable('family', function(table){
           table.increments('id').primary();
-          table.timestamp('expiration');
+          table.string('expiration');
           table.string('location');
           table.string('name');
           table.string('title');
           table.text('story');
           table.string('links');
           table.string('image');
-          table.string('expenseDescription')
           table.string('cost')
             table.integer('userId')
                  .references('id')
@@ -55,7 +54,7 @@ exports.up = function(knex, Promise) {
 exports.down = function(knex, Promise) {
     return Promise.all([
       knex.schema.dropTable('comments'),
-      knex.schema.dropTable('donor'),
+      knex.schema.dropTable('donation'),
       knex.schema.dropTable('family'),
       knex.schema.dropTable('users')
     ])

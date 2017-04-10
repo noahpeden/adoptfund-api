@@ -26,7 +26,7 @@ app.get('/api/v1/users', (request, response) => {
 })
 
 app.get('/api/v1/comments/:familyId', (request, response) => {
-  const {familyId} = req.params
+  const {familyId} = request.params
 
   database('comments').where('familyId', familyId).select()
   .then((comments) => {
@@ -37,10 +37,9 @@ app.get('/api/v1/comments/:familyId', (request, response) => {
   })
 })
 
-app.get('/api/v1/family/:number', (request, response) => {
-  const {number} = req.params
-
-  database('family').limit(number).select()
+// this gets the NUMBER of families requested back
+app.get('/api/v1/family/all', (request, response) => {
+  database('family').select()
   .then((comments) => {
     response.status(200).json(comments)
   })
@@ -49,8 +48,9 @@ app.get('/api/v1/family/:number', (request, response) => {
   })
 })
 
+
 app.get('/api/v1/family/:familyName', (request, response) => {
-  const {familyName} = req.params
+  const {familyName} = request.params
 
   database('family').where('name', familyName).select()
   .then((family) => {
@@ -62,7 +62,7 @@ app.get('/api/v1/family/:familyName', (request, response) => {
 })
 
 app.get('/api/v1/donation/:familyId', (request, response) => {
-  const {familyId} = req.params
+  const {familyId} = request.params
 
   database('donation').where('familyId', familyId).select()
   .then((donations) => {
@@ -75,8 +75,8 @@ app.get('/api/v1/donation/:familyId', (request, response) => {
 
 //QUERY PARAM ?userId=5
 app.get('/api/v1/family', (request, response) => {
-  const { userId } = request.query
-  database('family').where('userId', userId).select()
+  const { limit } = request.query
+  database('family').limit(limit).select()
   .then((family) => {
     response.status(200).json(family)
   })
@@ -86,14 +86,14 @@ app.get('/api/v1/family', (request, response) => {
 })
 
 app.post('/api/v1/users', (request, response) => {
-  const { email, password } = request.body
-  const user = { email, password }
+  const { email, password, firstName, lastName } = request.body
+  const user = { email, password, firstName, lastName }
 
   database('users').insert(user)
   .then(function() {
-    database('users').select()
-      .then(function(users) {
-        response.status(201).json(users)
+    database('users').where('email', email).select()
+      .then(function(user) {
+        response.status(201).json(user)
       })
       .catch(function(error) {
         response.status(422).json({'Response 422': 'Unprocessable Entity'})
@@ -102,11 +102,11 @@ app.post('/api/v1/users', (request, response) => {
 })
 
 app.post('/api/v1/comments', (request, response) => {
-  const { body, songKickVenueId, userId } = request.body
-  const comment = { body, songKickVenueId, userId }
+  const { body, familyId, userId } = request.body
+  const comment = { body, familyId, userId }
   database('comments').insert(comment)
   .then(function() {
-    database('comments').select()
+    database('comments').where('familyId', familyId).select()
       .then(function(comments) {
         response.status(201).json(comments)
       })
@@ -120,11 +120,11 @@ app.post('/api/v1/family', (request, response) => {
   const {
     expiration,
     location,
+    name,
     title,
     story,
     links,
     image,
-    expenseDescription,
     cost,
     userId
   } = request.body
@@ -132,17 +132,19 @@ app.post('/api/v1/family', (request, response) => {
   const family = {
     expiration,
     location,
+    name,
     title,
     story,
     links,
     image,
-    expenseDescription,
     cost,
     userId
   }
   database('family').insert(family)
-  .then(() => {
-    database('family').select()
+  .returning('id')
+  .then((id) => {
+    const firstId = id[0]
+    database('family').where('id', firstId).select()
       .then(function(family) {
         response.status(201).json(family)
       })
@@ -166,7 +168,7 @@ app.post('/api/v1/donation', (request, response) => {
   }
   database('donation').insert(donation)
   .then(()=> {
-    database('donation').select()
+    database('donation').where('familyId', familyId).select()
     .then(function(donations) {
       response.status(201).json(donations)
     })
@@ -179,6 +181,17 @@ app.post('/api/v1/donation', (request, response) => {
 app.delete('/api/v1/users/:id', (request, response)=> {
   const { id } = request.params
     database('users').where('id', id).select().del()
+    .then(function(count) {
+      if (count === 0) {
+        response.status(422).json({'Response 422': 'Unprocessable Entity'})
+      } else {
+        response.status(200).json({'Response 200': 'OK' })
+      }
+    })
+})
+app.delete('/api/v1/donation/:id', (request, response)=> {
+  const { id } = request.params
+    database('donation').where('id', id).select().del()
     .then(function(count) {
       if (count === 0) {
         response.status(422).json({'Response 422': 'Unprocessable Entity'})
@@ -241,6 +254,20 @@ app.patch('/api/v1/comments/:id', (request, response)=> {
       })
   })
 })
+app.patch('/api/v1/donation/:id', (request, response)=> {
+  const { id } = request.params
+  const { donationAmount } = request.body
+  database('donation').where('id', id).select()
+    .then((donation)=> {
+      database('donation').where('id', id).select().update({ donationAmount })
+      .then(function(donation) {
+        response.status(201).json(donation)
+      })
+      .catch(function(error) {
+        response.status(422).json({success: 'false'})
+      })
+  })
+})
 
 app.patch('/api/v1/family/:id', (request, response)=> {
   const { id } = request.params
@@ -269,20 +296,17 @@ app.patch('/api/v1/family/:id', (request, response)=> {
     image,
     cost
   }
-  database('family').where('id', id).select()
-    .then((favorite)=> {
-      database('family').where('id', id).select().update({ family })
-      .then(function(family) {
-        response.status(201).json({success: 'true'})
-      })
-      .catch(function(error) {
-        response.status(422).json({success: 'false'})
-      })
+    database('family').where('id', id).select().update({ family })
+    .then(function(family) {
+      response.status(201).json({success: 'true'})
+    })
+    .catch(function(error) {
+      response.status(422).json({success: 'false'})
+    })
   })
-})
 
 app.listen(app.get('port'), () => {
-  console.log(`${app.locals.title} is running on ${app.get('port')}.`)
+  console.log(`This thing is running on ${app.get('port')}.`)
 })
 
 module.exports = app;
