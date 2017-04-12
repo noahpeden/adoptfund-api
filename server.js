@@ -1,4 +1,6 @@
 const express = require('express')
+const Upload = require('s3-uploader');
+
 const app = express()
 const bodyParser = require('body-parser')
 const fs = require('fs')
@@ -9,6 +11,7 @@ const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
 
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
@@ -16,6 +19,42 @@ app.use(function(request, response, next) {
   response.header("Access-Control-Allow-Origin", "*");
   response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
+});
+
+var client = new Upload('adoptfund', {
+  aws: {
+    path: 'images/',
+    region: 'us-east-1',
+    acl: 'public-read'
+  },
+
+  cleanup: {
+    versions: true,
+    original: false
+  },
+
+  original: {
+    awsImageAcl: 'private'
+  },
+
+  versions: [{
+    maxHeight: 1040,
+    maxWidth: 1040,
+    format: 'jpg',
+    suffix: '-large',
+    quality: 80,
+    awsImageExpires: 31536000,
+    awsImageMaxAge: 31536000
+  }]
+});
+
+client.upload('/some/image.jpg', {}, function(err, versions, meta) {
+  if (err) { throw err; }
+
+  versions.forEach(function(image) {
+    console.log(image.width, image.height, image.url);
+    // 1024 760 https://my-bucket.s3.amazonaws.com/path/110ec58a-a0f2-4ac4-8393-c866d813b8d1.jpg
+  });
 });
 
 app.set('port', process.env.PORT || 3000)
