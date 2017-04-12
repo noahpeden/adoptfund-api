@@ -4,6 +4,9 @@ const bodyParser = require('body-parser')
 const fs = require('fs')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
+const bcrypt = require('bcrypt')
+const session = require('express-session')
+const flash = require('connect-flash')
 
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
@@ -12,8 +15,85 @@ const database = require('knex')(configuration);
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
+app.use(session({secret: '{secret}', name: 'session_id', saveUninitialized: true, resave: true}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
 app.set('port', process.env.PORT || 3000)
+
+function comparePass(userPassword, databasePassword) {
+  return bcrypt.compareSync(userPassword, databasePassword);
+}
+
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password',
+  },
+  function(username, password, done) {
+    database('users').where('email', username).select()
+    .then(user => {
+      if(!comparePass(password, user[0].password)){
+        return done(null, false, { message: 'Incorrect password.' })
+      }
+      return done(null, user)
+    })
+    .catch(err => {
+      console.log(err)
+      return done(null, false, { message: 'Not Found' })
+    })
+  }
+));
+
+app.post('/api/v1/register', (request, response) => {
+  const { email, password, firstName, lastName } = request.body
+  const salt = bcrypt.genSaltSync();
+  const hash = bcrypt.hashSync(password, salt);
+  database('users').where('email', email).select()
+  .then(user => {
+    if(user.length > 0){
+      response.status(404).json({'message': 'Already Exists'})
+    }else{
+      database('users').insert({
+        email,
+        firstName,
+        lastName,
+        password: hash,
+      })
+      .returning('*')
+      .then(response => {
+        response.status(200).json(response)
+        passport.authenticate('local', {
+          //actual domain of heroku app
+          successRedirect: '/api/v1/users',
+          // failureRedirect: '/login',
+          failureRedirect: '/api/v1/users',
+          failureFlash: true
+        })
+      })
+      .catch((error) => {
+        response.status(404).json({'Response 404': 'Not Found'})
+      })
+    }
+  })
+  .catch(err => {
+    console.log('err', err)
+  })
+})
+
+app.post('/api/v1/login',
+  passport.authenticate('local', function(err, user, info) {
+    console.log(err)
+    console.log(user)
+    console.log(info)
+    //actual domain of heroku app
+    // successRedirect: '/',
+    // successRedirect: '/api/v1/users',
+    // failureRedirect: '/login',
+    // failureRedirect: '/api/v1/comments',
+    // failureFlash: true
+  })
+);
 
 app.get('/api/v1/users', (request, response) => {
   database('users').select()
