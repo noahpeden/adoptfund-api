@@ -4,8 +4,8 @@ exports.seed = function(knex, Promise) {
     return Promise.all([
       knex('family').insert({
         userId: 1,
-        location: 'Denver1',
         expiration: new Date(),
+        location: 'Denver1',
         name: 'name1',
         title: 'title1',
         story: 'story1',
