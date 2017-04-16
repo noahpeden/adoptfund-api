@@ -17,6 +17,38 @@ exports.seed = function(knex, Promise) {
         password: "bloop",
         created_at: new Date,
         updated_at: new Date,
+      }),
+      knex('users').insert({
+        firstName: 'ac',
+        lastName: 'slater',
+        email: "acslater@gmail.com",
+        password: "bloop",
+        created_at: new Date,
+        updated_at: new Date,
+      }),
+      knex('users').insert({
+        firstName: 'ac',
+        lastName: 'slater',
+        email: "acslater@gmail.com",
+        password: "bloop",
+        created_at: new Date,
+        updated_at: new Date,
+      }),
+      knex('users').insert({
+        firstName: 'ac',
+        lastName: 'slater',
+        email: "acslater@gmail.com",
+        password: "bloop",
+        created_at: new Date,
+        updated_at: new Date,
+      }),
+      knex('users').insert({
+        firstName: 'ac',
+        lastName: 'slater',
+        email: "acslater@gmail.com",
+        password: "bloop",
+        created_at: new Date,
+        updated_at: new Date,
       })
     ]);
   });

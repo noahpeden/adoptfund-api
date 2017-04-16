@@ -20,6 +20,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
+app.use(function(request, response, next) {
+  response.header("Access-Control-Allow-Origin", "*");
+  response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.set('port', process.env.PORT || 3000)
 
 function comparePass(userPassword, databasePassword) {
