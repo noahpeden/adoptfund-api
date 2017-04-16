@@ -52,7 +52,7 @@ app.post('/api/v1/register', (request, response) => {
   database('users').where('email', email).select()
   .then(user => {
     if(user.length > 0){
-      response.status(404).json({'message': 'Already Exists'})
+      response.status(422).json({'message': 'Already Exists'})
     }else{
       database('users').insert({
         email,
@@ -61,39 +61,33 @@ app.post('/api/v1/register', (request, response) => {
         password: hash,
       })
       .returning('*')
-      .then(response => {
-        response.status(200).json(response)
-        passport.authenticate('local', {
-          //actual domain of heroku app
-          successRedirect: '/api/v1/users',
-          // failureRedirect: '/login',
-          failureRedirect: '/api/v1/users',
-          failureFlash: true
-        })
+      .then(user => {
+        response.status(200).json(user)
       })
-      .catch((error) => {
-        response.status(404).json({'Response 404': 'Not Found'})
+      .catch(err => {
+        response.status(404).json(err)
       })
     }
   })
   .catch(err => {
-    console.log('err', err)
+    response.status(404).json({'Response 404': 'Not Found'})
   })
 })
 
-app.post('/api/v1/login',
-  passport.authenticate('local', function(err, user, info) {
-    console.log(err)
-    console.log(user)
-    console.log(info)
-    //actual domain of heroku app
-    // successRedirect: '/',
-    // successRedirect: '/api/v1/users',
-    // failureRedirect: '/login',
-    // failureRedirect: '/api/v1/comments',
-    // failureFlash: true
+app.post('/api/v1/login', (request, response) => {
+  const {email, password} = request.body
+
+  database('users').where('email', email).select()
+  .then(user => {
+    if(!comparePass(password, user[0].password)){
+      response.status(404).json({ message: 'Incorrect password.' })
+    }
+    response.status(200).json(user)
   })
-);
+  .catch(err => {
+    response.status(404).json({ message: 'Email Not Found.' })
+  })
+})
 
 app.get('/api/v1/users', (request, response) => {
   database('users').select()
@@ -165,22 +159,6 @@ app.get('/api/v1/family', (request, response) => {
   })
 })
 
-app.post('/api/v1/users', (request, response) => {
-  const { email, password, firstName, lastName } = request.body
-  const user = { email, password, firstName, lastName }
-
-  database('users').insert(user)
-  .then(function() {
-    database('users').where('email', email).select()
-      .then(function(user) {
-        response.status(201).json(user)
-      })
-      .catch(function(error) {
-        response.status(422).json({'Response 422': 'Unprocessable Entity'})
-      });
-  })
-})
-
 app.post('/api/v1/comments', (request, response) => {
   const { body, familyId, userId } = request.body
   const comment = { body, familyId, userId }
@@ -237,13 +215,17 @@ app.post('/api/v1/family', (request, response) => {
 app.post('/api/v1/donation', (request, response) => {
   const {
     donationAmount,
-    userId,
+    firstName,
+    lastName,
+    email,
     familyId
   } = request.body
 
   const donation = {
     donationAmount,
-    userId,
+    firstName,
+    lastName,
+    email,
     familyId
   }
   database('donation').insert(donation)
