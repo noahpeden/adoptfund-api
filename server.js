@@ -4,6 +4,9 @@ const bodyParser = require('body-parser')
 const fs = require('fs')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
+const bcrypt = require('bcrypt')
+const session = require('express-session')
+const flash = require('connect-flash')
 
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
@@ -12,6 +15,11 @@ const database = require('knex')(configuration);
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
+app.use(session({secret: '{secret}', name: 'session_id', saveUninitialized: true, resave: true}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
 app.use(function(request, response, next) {
   response.header("Access-Control-Allow-Origin", "*");
   response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -19,6 +27,73 @@ app.use(function(request, response, next) {
 });
 
 app.set('port', process.env.PORT || 3000)
+
+function comparePass(userPassword, databasePassword) {
+  return bcrypt.compareSync(userPassword, databasePassword);
+}
+
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password',
+  },
+  function(username, password, done) {
+    database('users').where('email', username).select()
+    .then(user => {
+      if(!comparePass(password, user[0].password)){
+        return done(null, false, { message: 'Incorrect password.' })
+      }
+      return done(null, user)
+    })
+    .catch(err => {
+      console.log(err)
+      return done(null, false, { message: 'Not Found' })
+    })
+  }
+));
+
+app.post('/api/v1/register', (request, response) => {
+  const { email, password, firstName, lastName } = request.body
+  const salt = bcrypt.genSaltSync();
+  const hash = bcrypt.hashSync(password, salt);
+  database('users').where('email', email).select()
+  .then(user => {
+    if(user.length > 0){
+      response.status(422).json({'message': 'Already Exists'})
+    }else{
+      database('users').insert({
+        email,
+        firstName,
+        lastName,
+        password: hash,
+      })
+      .returning('*')
+      .then(user => {
+        response.status(200).json(user)
+      })
+      .catch(err => {
+        response.status(404).json(err)
+      })
+    }
+  })
+  .catch(err => {
+    response.status(404).json({'Response 404': 'Not Found'})
+  })
+})
+
+app.post('/api/v1/login', (request, response) => {
+  const {email, password} = request.body
+
+  database('users').where('email', email).select()
+  .then(user => {
+    if(!comparePass(password, user[0].password)){
+      response.status(404).json({ message: 'Incorrect password.' })
+    }
+    response.status(200).json(user)
+  })
+  .catch(err => {
+    response.status(404).json({ message: 'Email Not Found.' })
+  })
+})
 
 app.get('/api/v1/users', (request, response) => {
   database('users').select()
@@ -90,22 +165,6 @@ app.get('/api/v1/family', (request, response) => {
   })
 })
 
-app.post('/api/v1/users', (request, response) => {
-  const { email, password, firstName, lastName } = request.body
-  const user = { email, password, firstName, lastName }
-
-  database('users').insert(user)
-  .then(function() {
-    database('users').where('email', email).select()
-      .then(function(user) {
-        response.status(201).json(user)
-      })
-      .catch(function(error) {
-        response.status(422).json({'Response 422': 'Unprocessable Entity'})
-      });
-  })
-})
-
 app.post('/api/v1/comments', (request, response) => {
   const { body, familyId, userId } = request.body
   const comment = { body, familyId, userId }
@@ -162,13 +221,17 @@ app.post('/api/v1/family', (request, response) => {
 app.post('/api/v1/donation', (request, response) => {
   const {
     donationAmount,
-    userId,
+    firstName,
+    lastName,
+    email,
     familyId
   } = request.body
 
   const donation = {
     donationAmount,
-    userId,
+    firstName,
+    lastName,
+    email,
     familyId
   }
   database('donation').insert(donation)

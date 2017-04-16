@@ -25,10 +25,10 @@ exports.up = function(knex, Promise) {
         }),
         knex.schema.createTable('donation', function(table){
           table.increments('id').primary();
-          table.string('donationAmount')
-            table.integer('userId')
-                 .references('id')
-                 .inTable('users');
+          table.string('donationAmount');
+          table.string('firstName')
+          table.string('lastName')
+          table.string('email')
             table.integer('familyId')
                  .references('id')
                  .inTable('family');
