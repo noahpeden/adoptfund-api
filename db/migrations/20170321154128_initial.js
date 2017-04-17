@@ -18,14 +18,15 @@ exports.up = function(knex, Promise) {
           table.text('story');
           table.string('links');
           table.string('image');
-          table.string('cost')
+          table.integer('amountFunded')
+          table.integer('cost')
             table.integer('userId')
                  .references('id')
                  .inTable('users');
         }),
         knex.schema.createTable('donation', function(table){
           table.increments('id').primary();
-          table.string('donationAmount');
+          table.integer('donationAmount');
           table.string('firstName')
           table.string('lastName')
           table.string('email')
