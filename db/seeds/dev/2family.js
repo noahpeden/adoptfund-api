@@ -11,7 +11,8 @@ exports.seed = function(knex, Promise) {
         story: 'story1',
         links: 'link1',
         image: 'image1',
-        cost: 'cost1',
+        amountFunded: 5000,
+        cost: 30000,
       }),
       knex('family').insert({
         userId: 2,
@@ -22,7 +23,8 @@ exports.seed = function(knex, Promise) {
         story: 'story2',
         links: 'link2',
         image: 'image2',
-        cost: 'cost2',
+        amountFunded: 5000,
+        cost: 30000,
       }),
       knex('family').insert({
         userId: 3,
@@ -33,7 +35,8 @@ exports.seed = function(knex, Promise) {
         story: 'story3',
         links: 'link3',
         image: 'image3',
-        cost: 'cost3',
+        amountFunded: 5000,
+        cost: 30000,
       }),
       knex('family').insert({
         userId: 4,
@@ -44,7 +47,8 @@ exports.seed = function(knex, Promise) {
         story: 'story4',
         links: 'link4',
         image: 'image4',
-        cost: 'cost4',
+        amountFunded: 5000,
+        cost: 30000,
       }),
       knex('family').insert({
         userId: 5,
@@ -55,7 +59,8 @@ exports.seed = function(knex, Promise) {
         story: 'story5',
         links: 'link5',
         image: 'image5',
-        cost: 'cost5',
+        amountFunded: 5000,
+        cost: 30000,
       }),
       knex('family').insert({
         userId: 6,
@@ -66,7 +71,8 @@ exports.seed = function(knex, Promise) {
         story: 'story6',
         links: 'link6',
         image: 'image6',
-        cost: 'cost6',
+        amountFunded: 5000,
+        cost: 30000,
       }),
     ]);
   });
