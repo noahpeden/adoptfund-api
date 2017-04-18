@@ -521,20 +521,23 @@ describe('Server', () => {
           })
         })
       })
-    // describe('PATCH /api/favorites/:id', ()=> {
-    //   it('should edit a favorites body', (done)=> {
-    //     chai.request(server)
-    //     .patch('/api/v1/favorites')
-    //     .send({
-    //       rating: '5'
-    //     })
-    //     .end((error, res)=> {
-    //       expect(res).to.have.status(404)
-    //       expect(res.body).to.be.a('object')
-    //       done()
-    //     })
-    //   })
-    // })
+
+  describe('PATCH /api/family/:id', ()=> {
+    it.only('should edit a favorites body', (done)=> {
+      let updatedFamily = {
+        story:'we have a new story'
+      }
+      chai.request(server)
+      .patch('/api/v1/family/1')
+      .send(updatedFamily)
+      .end((error, res)=> {
+        expect(res).to.have.status(200)
+        expect(res.body).to.be.a('array')
+        expect(res.body[0].story).to.equal('we have a new story')
+        done()
+      })
+    })
+  })
     //
     //
     // //SAD PATH
