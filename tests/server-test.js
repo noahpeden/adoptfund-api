@@ -5,7 +5,7 @@ const chaiHttp = require('chai-http');
 const server = require('../server.js');
 const configuration = require('../knexfile')['test'];
 const database = require('knex')(configuration);
-const knex = require('knex')(configuration)
+// const knex = require('knex')(configuration)
 
 
 chai.use(chaiHttp);
@@ -132,47 +132,52 @@ describe('GET /api/v1/family/all', () => {
 });
 
 // COME BACK TO THIS ONE
-describe('GET /api/v1/donation/:familyId', () => {
-  it.only('should respond back with all donation', (done) => {
-    chai.request(server)
-    .get('https://adoptfund-api.herokuapp.com/api/v1/donation/1')
-    .end((err, res) => {
-      if(err) {done(err) }
-      expect(res).to.have.status(200);
-      expect(res).to.be.json;
-      expect(res.body).to.be.a('array');
-      expect(res.body).to.have.length(0);
-      done();
-    });
-  });
-});
-
- //SAD PATH
-describe('GET /api/v1/donation', () => {
-  it('should respond back with a 404 error', (done) => {
-    chai.request(server)
-    .get('/api/v1/donations')
-    .end((err, res) => {
-      expect(res).to.have.status(404);
-      done();
-    });
-  });
-});
-
-// describe('POST /api/v1/users', function() {
-//     it('should create a new user', function(done) {
-//       let user = {userName:'user fun'}
-//       chai.request(server)
-//       .post('/api/v1/users')
-//       .send(user)
-//       .end((err, res) => {
-//       expect(res).to.have.status(201);
+// describe('GET /api/v1/donation/:familyId', () => {
+//   it.only('should respond back with all donation', (done) => {
+//     chai.request(server)
+//     .get('https://adoptfund-api.herokuapp.com/api/v1/donation/1')
+//     .end((err, res) => {
+//       if(err) {done(err) }
+//       expect(res).to.have.status(200);
 //       expect(res).to.be.json;
 //       expect(res.body).to.be.a('array');
+//       expect(res.body).to.have.length(0);
 //       done();
 //     });
 //   });
 // });
+//
+//  //SAD PATH
+// describe('GET /api/v1/donation', () => {
+//   it('should respond back with a 404 error', (done) => {
+//     chai.request(server)
+//     .get('/api/v1/donations')
+//     .end((err, res) => {
+//       expect(res).to.have.status(404);
+//       done();
+//     });
+//   });
+// });
+
+describe('POST /api/v1/register', function() {
+    it.only('should create a new user', function(done) {
+      let user = {
+        email:'mikeziccardi@ishandsome.com',
+        password:'thepasswordistaco',
+        firstName:'Mike',
+        lastName:'IsHandsome'
+      }
+      chai.request(server)
+      .post('/api/v1/register')
+      .send(user)
+      .end((err, res) => {
+      expect(res).to.have.status(200);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('array');
+      done();
+    });
+  });
+});
 //
 //  //SAD PATH
 // describe('POST /api/v1/users', function() {
