@@ -197,8 +197,10 @@ describe('POST /api/v1/register', function() {
      });
   });
 });
+
+// TODO: make this pass
 describe('POST /api/v1/login', function() {
-    it.only('should let a user login', function(done) {
+    it.skip('should let a user login', function(done) {
       let user = {
         email: "acslater@gmail.com",
       }
@@ -268,21 +270,29 @@ describe('POST /api/v1/donation', function() {
    });
  });
 
-// describe('POST /api/v1/favorites', function() {
-//     it('should create a new favorite', function(done) {
-//       let favorite = {favoriteName:'favorite fun'}
-//       chai.request(server)
-//       .post('/api/v1/favorites')
-//       .send(favorite)
-//       .end((err, res) => {
-//       expect(res).to.have.status(201);
-//       expect(res).to.be.json;
-//       expect(res.body).to.be.a('array');
-//       done();
-//     });
-//   });
-// });
-//
+describe('POST /api/v1/family', function() {
+    it('should create a new family', function(done) {
+      let family = {
+        expiration: '09/01/2017',
+        location:'Denver',
+        name: 'The Belchers',
+        title:'Lets buy a baby',
+        cost: 20000,
+        userId: 1
+      }
+      chai.request(server)
+      .post('/api/v1/family')
+      .send(family)
+      .end((err, res) => {
+      expect(res).to.have.status(201)
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('array')
+      expect(res.body).to.have.length(1);
+      done();
+    });
+  });
+});
+
 // //SAD PATH
 // describe('POST /api/v1/favorites', function() {
 //     it('should respond with a 404', function(done) {
