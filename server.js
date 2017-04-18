@@ -22,6 +22,7 @@ app.use(flash());
 
 app.use(function(request, response, next) {
   response.header("Access-Control-Allow-Origin", "*");
+  response.header('Access-Control-Allow-Methods', 'GET, POST, PATCH ,DELETE');
   response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
@@ -351,8 +352,11 @@ app.patch('/api/v1/family/:id', (request, response)=> {
     cost
   } = request.body
     database('family').where('id', id).select().update({ expiration, amountFunded, location, name, title, links, story, image, cost })
-    .then(function(family) {
-      response.status(201).json({success: 'true'})
+    .then((familyId) => {
+      database('family').where('id', id).select()
+      .then((family) => {
+        response.status(200).json(family)
+      })
     })
     .catch(function(error) {
       console.log(error);
