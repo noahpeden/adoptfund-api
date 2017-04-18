@@ -353,7 +353,7 @@ app.patch('/api/v1/family/:id', (request, response)=> {
   } = request.body
     database('family').where('id', id).select().update({ expiration, amountFunded, location, name, title, links, story, image, cost })
     .then(function(family) {
-      response.status(201).json({success: 'true'})
+      response.status(201).json(family)
     })
     .catch(function(error) {
       console.log(error);
