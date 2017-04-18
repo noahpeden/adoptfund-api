@@ -1,4 +1,5 @@
 const express = require('express')
+require('dotenv').config()
 const app = express()
 const bodyParser = require('body-parser')
 const fs = require('fs')
@@ -11,6 +12,7 @@ const flash = require('connect-flash')
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
+const aws = require('aws-sdk');
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -217,6 +219,35 @@ app.post('/api/v1/family', (request, response) => {
         response.status(422).json({'Response 422': 'Unprocessable Entity'})
       });
   })
+})
+
+app.post('/api/v1/family/pic/', (request, response) => {
+  let s3 = new aws.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+});
+
+  const fileName = request.query['file-name']
+  const fileType = request.query['file-type']
+  const s3Params = {
+    Bucket: 'adoptfund1',
+    Key: fileName,
+    Expires: 60,
+    ContentType: fileType,
+    ACL: 'public-read'
+  }
+  s3.getSignedUrl('putObject', s3Params, (err, data) => {
+    if(err){
+      console.log(err);
+      return response.end();
+    }
+    const returnData = {
+      signedRequest: data,
+      url: `https://adoptfund1.s3.amazonaws.com/${fileName}`
+    };
+    response.write(JSON.stringify(returnData));
+    response.end();
+  });
 })
 
 app.post('/api/v1/donation', (request, response) => {
