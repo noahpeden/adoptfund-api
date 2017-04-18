@@ -352,8 +352,11 @@ app.patch('/api/v1/family/:id', (request, response)=> {
     cost
   } = request.body
     database('family').where('id', id).select().update({ expiration, amountFunded, location, name, title, links, story, image, cost })
-    .then(function(family) {
-      response.status(201).json(family)
+    .then((familyId) => {
+      database('family').where('id', id).select()
+      .then((family) => {
+        response.status(200).json(family)
+      })
     })
     .catch(function(error) {
       console.log(error);
