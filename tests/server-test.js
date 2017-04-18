@@ -344,7 +344,7 @@ describe('POST /api/v1/family', function() {
 });
 
 describe('POST /api/v1/comments', function() {
-    it.only('should create a new comment', function(done) {
+    it('should create a new comment', function(done) {
       let comment = {
         body:'This is a neato comment',
         familyId: 2,
@@ -363,70 +363,53 @@ describe('POST /api/v1/comments', function() {
   });
 });
 
-// //SAD PATH
-// describe('POST /api/v1/comments/:userId/:venueId', function() {
-//     it('should respond with a 404', function(done) {
-//       let user = {userName:'user fun'}
-//       chai.request(server)
-//       .post('/api/v1/favoritess')
-//       .send(user)
-//       .end((err, res) => {
-//       expect(res).to.have.status(404);
-//       expect(res.body).to.be.a('object');
-//       done();
-//     });
-//   });
-// });
-//
-// //SAD PATH
-//  describe('POST /api/v1/donation', function() {
-//      it('should respond with a 404', function(done) {
-//        let token = {token:'token fun'}
-//        chai.request(server)
-//        .post('/api/v1/donations')
-//        .send(token)
-//        .end((err, res) => {
-//        expect(res).to.have.status(404);
-//        expect(res.body).to.be.a('object');
-//        done();
-//      });
-//    });
-//  });
-//
-// describe('DELETE /api/v1/users/:id', ()=> {
-// beforeEach(function(done){
-//   database('users').insert({
-//           email: 'shakira@gmail.com',
-//           password: 'bloop',
-//         }).then(function(){
-//           done()
-//         })
-// })
-// it('should delete a user', (done)=> {
-//     chai.request(server)
-//     .delete('/api/v1/users/1')
-//     .end((error, res)=> {
-//       expect(res).to.have.status(422)
-//       expect(res).to.be.json
-//       expect(res.body).to.be.a('object')
-//       done()
-//     })
-//   })
-// })
-//
-// //SAD PATH
-// describe('DELETE /api/v1/users/:id', function() {
-//   it('should return a 422 if user is not found', function(done) {
-//     chai.request(server)
-//     .delete('/api/v1/users/1')
-//     .end(function(err, res) {
-//       expect(res).to.have.status(422);
-//       expect(res).to.be.json;
-//       expect(res.body).to.be.a('object');
-//       done();
-//       });
-//     });
-// });
+//SAD PATH
+describe('POST /api/v1/comments', function() {
+    it('should respond with a 404', function(done) {
+      let comment = {
+        body:'This is a neato comment',
+        familyId: 2,
+        userId: 1,
+      }
+      chai.request(server)
+      .post('/api/v1/comment')
+      .send(comment)
+      .end((err, res) => {
+      expect(res).to.have.status(404);
+      expect(res.body).to.be.a('object');
+      done();
+    });
+  });
+});
+
+//Cant delete user if family is still associated with it?
+describe('DELETE /api/v1/users/:id', ()=> {
+it.skip('should delete a user', (done)=> {
+    chai.request(server)
+    .delete('/api/v1/users/1')
+    .end((error, res)=> {
+      expect(res).to.have.status(422)
+      expect(res).to.be.json
+      expect(res.body).to.be.a('object')
+      expect(res.body).to.have.length(5)
+      done()
+    })
+  })
+})
+
+//SAD PATH
+describe('DELETE /api/v1/users/:id', function() {
+  it('should return a 422 if user is not found', function(done) {
+    chai.request(server)
+    .delete('/api/v1/users/134')
+    .end(function(err, res) {
+      expect(res).to.have.status(422);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('object');
+      done();
+      });
+    });
+});
 //
 // describe('DELETE /api/v1/comments/:id', ()=> {
 // beforeEach(function(done){
