@@ -523,7 +523,7 @@ describe('Server', () => {
       })
 
   describe('PATCH /api/family/:id', ()=> {
-    it.only('should edit a favorites body', (done)=> {
+    it('should edit a favorites body', (done)=> {
       let updatedFamily = {
         story:'we have a new story'
       }
@@ -538,18 +538,15 @@ describe('Server', () => {
       })
     })
   })
-    //
-    //
-    // //SAD PATH
-    // describe('PATCH /api/v1/favorites/:id', ()=> {
-    //     it('should return 404 if incorrect path is entered', (done)=> {
-    //       chai.request(server)
-    //       .post('/api/v1/favorites/1')
-    //       .end((error, res)=> {
-    //         expect(res).to.have.status(404)
-    //         done()
-    //       })
-    //     })
-    //   })
-    // })
-  })
+    //SAD PATH
+    describe('PATCH /api/v1/favorites/:id', ()=> {
+        it('should return 404 if incorrect path is entered', (done)=> {
+          chai.request(server)
+          .post('/api/v1/favorites/1')
+          .end((error, res)=> {
+            expect(res).to.have.status(404)
+            done()
+          })
+        })
+      })
+    })
