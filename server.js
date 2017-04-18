@@ -118,7 +118,6 @@ app.get('/api/v1/comments/:familyId', (request, response) => {
   })
 })
 
-// this gets the NUMBER of families requested back
 app.get('/api/v1/family/all', (request, response) => {
   database('family').select()
   .then((comments) => {
@@ -129,6 +128,17 @@ app.get('/api/v1/family/all', (request, response) => {
   })
 })
 
+app.get('/api/v1/myFamily/:userId', (request, response) => {
+  const {userId} = request.params
+  
+  database('family').where('userId', userId).select()
+  .then(family => {
+    response.status(200).json(family)
+  })
+  .catch((error) => {
+    response.status(404).json({'Response 404': 'Not Found'})
+  })
+})
 
 app.get('/api/v1/family/:familyName', (request, response) => {
   const {familyName} = request.params
