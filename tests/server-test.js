@@ -1,3 +1,6 @@
+process.env.NODE_ENV = 'test';
+
+
 const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert
@@ -11,32 +14,33 @@ const database = require('knex')(configuration);
 chai.use(chaiHttp);
 
 describe('Server', () => {
-  it('should exist', () => {
-    expect(server).to.exist;
-  });
-});
-
-beforeEach(function(done){
-  database('users').truncate();
-  database('family').truncate();
-  database('donation').truncate();
-  database('comments').truncate();
-  done();
-});
-
-
-describe('GET /', () => {
-  it('should send back an html file', (done) => {
-    chai.request(server)
-    .get('/')
-    .end((err, res) => {
-      if(err) { done(err); }
-      expect(res).to.have.status(200);
-      expect(res).to.be.html;
-      done();
+  beforeEach(function(done) {
+  database.migrate.rollback()
+  .then(function() {
+    database.migrate.latest()
+    .then(function() {
+      return database.seed.run()
+      .then(function() {
+        done();
+      });
     });
   });
 });
+it('should exist', () => {
+    expect(server).to.exist;
+  });
+  describe('GET /', () => {
+    it('should send back an html file', (done) => {
+      chai.request(server)
+      .get('/')
+      .end((err, res) => {
+        if(err) { done(err); }
+        expect(res).to.have.status(200);
+        expect(res).to.be.html;
+        done();
+      });
+    });
+  });
 
  //SAD PATH
 describe('GET /', () => {
@@ -51,7 +55,7 @@ describe('GET /', () => {
 });
 
 describe('GET /api/v1/users', () => {
-  it.only('should respond back with all users', (done) => {
+  it('should respond back with all users', (done) => {
     chai.request(server)
     .get('/api/v1/users')
     .end((err, res) => {
@@ -59,7 +63,7 @@ describe('GET /api/v1/users', () => {
       expect(res).to.have.status(200);
       expect(res).to.be.json;
       expect(res.body).to.be.a('array');
-      expect(res.body).to.have.length(2);
+      expect(res.body).to.have.length(6);
       done();
     });
   });
@@ -86,7 +90,7 @@ describe('GET /api/v1/comments/:familyId', () => {
       expect(res).to.have.status(200);
       expect(res).to.be.json;
       expect(res.body).to.be.a('array');
-      expect(res.body).to.have.length(1);
+      expect(res.body).to.have.length(2);
       done();
     });
   });
@@ -113,7 +117,7 @@ describe('GET /api/v1/family/all', () => {``
       expect(res).to.have.status(200);
       expect(res).to.be.json;
       expect(res.body).to.be.a('array');
-      expect(res.body).to.have.length(2);
+      expect(res.body).to.have.length(6);
       done();
     });
   });
@@ -160,7 +164,7 @@ describe('GET /api/v1/family/all', () => {
 // });
 
 describe('POST /api/v1/register', function() {
-    it.only('should create a new user', function(done) {
+    it('should create a new user', function(done) {
       let user = {
         email:'mikeziccardi@ishandsome.com',
         password:'thepasswordistaco',
@@ -466,3 +470,4 @@ describe('POST /api/v1/register', function() {
 //     })
 //   })
 // })
+})
