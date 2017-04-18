@@ -136,32 +136,32 @@ describe('GET /api/v1/family/all', () => {
 });
 
 // COME BACK TO THIS ONE
-// describe('GET /api/v1/donation/:familyId', () => {
-//   it.only('should respond back with all donation', (done) => {
-//     chai.request(server)
-//     .get('https://adoptfund-api.herokuapp.com/api/v1/donation/1')
-//     .end((err, res) => {
-//       if(err) {done(err) }
-//       expect(res).to.have.status(200);
-//       expect(res).to.be.json;
-//       expect(res.body).to.be.a('array');
-//       expect(res.body).to.have.length(0);
-//       done();
-//     });
-//   });
-// });
-//
-//  //SAD PATH
-// describe('GET /api/v1/donation', () => {
-//   it('should respond back with a 404 error', (done) => {
-//     chai.request(server)
-//     .get('/api/v1/donations')
-//     .end((err, res) => {
-//       expect(res).to.have.status(404);
-//       done();
-//     });
-//   });
-// });
+describe('GET /api/v1/donation/:familyId', () => {
+  it('should respond back with all donation', (done) => {
+    chai.request(server)
+    .get('/api/v1/donation/1')
+    .end((err, res) => {
+      if(err) {done(err) }
+      expect(res).to.have.status(200);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('array');
+      expect(res.body).to.have.length(1);
+      done();
+    });
+  });
+});
+
+ //SAD PATH
+describe('GET /api/v1/donation', () => {
+  it('should respond back with a 404 error', (done) => {
+    chai.request(server)
+    .get('/api/v1/donations')
+    .end((err, res) => {
+      expect(res).to.have.status(404);
+      done();
+    });
+  });
+});
 
 describe('POST /api/v1/register', function() {
     it('should create a new user', function(done) {
@@ -183,37 +183,77 @@ describe('POST /api/v1/register', function() {
   });
 });
 //
-//  //SAD PATH
-// describe('POST /api/v1/users', function() {
-//      it('should respond with a 404', function(done) {
-//        let user = {userName:'user fun'}
-//        chai.request(server)
-//        .post('/api/v1/userss')
-//        .send(user)
-//        .end((err, res) => {
-//        expect(res).to.have.status(404);
-//        expect(res.body).to.be.a('object');
-//        done();
-//      });
+ //SAD PATH
+describe('POST /api/v1/register', function() {
+     it('should respond with a 404', function(done) {
+       let user = {userName:'user fun'}
+       chai.request(server)
+       .post('/api/v1/userss')
+       .send(user)
+       .end((err, res) => {
+       expect(res).to.have.status(404);
+       expect(res.body).to.be.a('object');
+       done();
+     });
+  });
+});
+// TODO: MAKE THIS PASS
+// describe('POST /api/v1/login', function() {
+//     it.only('should let a user login', function(done) {
+//       let user = {
+//         email: "acslater@gmail.com",
+//       }
+//       chai.request(server)
+//       .post('/api/v1/login')
+//       .send(user)
+//       .end((err, res) => {
+//       expect(res).to.have.status(200);
+//       expect(res).to.be.json;
+//       expect(res.body).to.be.a('array');
+//       expect(res.body).to.have.length(1);
+//       done();
+//     });
 //   });
 // });
 //
-//
-// describe('POST /api/v1/comments', function() {
-//       it('should create a new comment', function(done) {
-//         let comment = {commentName:'comment fun'}
-//         chai.request(server)
-//         .post('/api/v1/comments')
-//         .send(comment)
-//         .end((err, res) => {
-//         expect(res).to.have.status(201);
-//         expect(res).to.be.json;
-//         expect(res.body).to.be.a('array');
-//         done();
-//       });
-//    });
-// });
-//
+ //SAD PATH
+describe('POST /api/v1/login', function() {
+     it('should respond with a 404', function(done) {
+       let user = {userName:'user fun'}
+       chai.request(server)
+       .post('/api/v1/userss')
+       .send(user)
+       .end((err, res) => {
+       expect(res).to.have.status(404);
+       expect(res.body).to.be.a('object');
+       done();
+     });
+  });
+});
+
+
+describe('POST /api/v1/donation', function() {
+      it.only('should create a new donation', function(done) {
+        let donation = {
+          familyId:1,
+          donationAmount:100,
+          firstName:'bob',
+          lastName:'belcher',
+          email:'burgerbob@aol.com',
+        }
+        chai.request(server)
+        .post('/api/v1/donation')
+        .send(donation)
+        .end((err, res) => {
+        expect(res).to.have.status(201);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a('array');
+        expect(res.body).to.have.length(2);
+        done();
+      });
+   });
+});
+
 // //SAD PATH
 //  describe('POST /api/v1/comments', function() {
 //      it('should respond with a 404', function(done) {
