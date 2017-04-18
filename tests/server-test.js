@@ -5,6 +5,8 @@ const chaiHttp = require('chai-http');
 const server = require('../server.js');
 const configuration = require('../knexfile')['test'];
 const database = require('knex')(configuration);
+const knex = require('knex')(configuration)
+
 
 chai.use(chaiHttp);
 
@@ -16,7 +18,8 @@ describe('Server', () => {
 
 beforeEach(function(done){
   database('users').truncate();
-  database('favorites').truncate();
+  database('family').truncate();
+  database('donation').truncate();
   database('comments').truncate();
   done();
 });
@@ -48,7 +51,7 @@ describe('GET /', () => {
 });
 
 describe('GET /api/v1/users', () => {
-  it('should respond back with all users', (done) => {
+  it.only('should respond back with all users', (done) => {
     chai.request(server)
     .get('/api/v1/users')
     .end((err, res) => {
@@ -101,60 +104,61 @@ describe('GET /api/v1/comments', () => {
   });
 });
 
-// describe('GET /api/v1/favorites', () => {``
-//   it('should respond back with all favorites', (done) => {
-//     chai.request(server)
-//     .get('/api/v1/favorites')
-//     .end((err, res) => {
-//       if(err) {done(err) }
-//       expect(res).to.have.status(200);
-//       expect(res).to.be.json;
-//       expect(res.body).to.be.a('array');
-//       expect(res.body).to.have.length(5);
-//       done();
-//     });
-//   });
-// });
-//
-// //SAD PATH
-// describe('GET /api/v1/favorites', () => {
-//   it('should respond back with a 404 error', (done) => {
-//     chai.request(server)
-//     .get('/api/v1/favoritess')
-//     .end((err, res) => {
-//       expect(res).to.have.status(404);
-//       done();
-//     });
-//   });
-// });
-//
-// describe('GET /api/v1/donation', () => {
-//   it('should respond back with all donation', (done) => {
-//     chai.request(server)
-//     .get('/api/v1/donation')
-//     .end((err, res) => {
-//       if(err) {done(err) }
-//       expect(res).to.have.status(200);
-//       expect(res).to.be.json;
-//       expect(res.body).to.be.a('array');
-//       expect(res.body).to.have.length(0);
-//       done();
-//     });
-//   });
-// });
-//
-//  //SAD PATH
-// describe('GET /api/v1/donation', () => {
-//   it('should respond back with a 404 error', (done) => {
-//     chai.request(server)
-//     .get('/api/v1/donations')
-//     .end((err, res) => {
-//       expect(res).to.have.status(404);
-//       done();
-//     });
-//   });
-// });
-//
+describe('GET /api/v1/family/all', () => {``
+  it('should respond back with all family', (done) => {
+    chai.request(server)
+    .get('/api/v1/family')
+    .end((err, res) => {
+      if(err) {done(err) }
+      expect(res).to.have.status(200);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('array');
+      expect(res.body).to.have.length(2);
+      done();
+    });
+  });
+});
+
+//SAD PATH
+describe('GET /api/v1/family/all', () => {
+  it('should respond back with a 404 error', (done) => {
+    chai.request(server)
+    .get('/api/v1/famly/all')
+    .end((err, res) => {
+      expect(res).to.have.status(404);
+      done();
+    });
+  });
+});
+
+// COME BACK TO THIS ONE
+describe('GET /api/v1/donation/:familyId', () => {
+  it.only('should respond back with all donation', (done) => {
+    chai.request(server)
+    .get('https://adoptfund-api.herokuapp.com/api/v1/donation/1')
+    .end((err, res) => {
+      if(err) {done(err) }
+      expect(res).to.have.status(200);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('array');
+      expect(res.body).to.have.length(0);
+      done();
+    });
+  });
+});
+
+ //SAD PATH
+describe('GET /api/v1/donation', () => {
+  it('should respond back with a 404 error', (done) => {
+    chai.request(server)
+    .get('/api/v1/donations')
+    .end((err, res) => {
+      expect(res).to.have.status(404);
+      done();
+    });
+  });
+});
+
 // describe('POST /api/v1/users', function() {
 //     it('should create a new user', function(done) {
 //       let user = {userName:'user fun'}
