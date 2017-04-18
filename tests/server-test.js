@@ -163,6 +163,34 @@ describe('GET /api/v1/donation', () => {
   });
 });
 
+//GET FAMILY WITH PARAM
+describe('GET /api/v1/family', () => {
+  it('should respond back with the number of families we ask for', (done) => {
+    chai.request(server)
+    .get('/api/v1/family/?limit=3')
+    .end((err, res) => {
+      if(err) {done(err) }
+      expect(res).to.have.status(200);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('array');
+      expect(res.body).to.have.length(3);
+      done();
+    });
+  });
+});
+
+ //SAD PATH
+describe('GET /api/v1/family', () => {
+  it('should respond back with a 404 error', (done) => {
+    chai.request(server)
+    .get('/api/v1/familly')
+    .end((err, res) => {
+      expect(res).to.have.status(404);
+      done();
+    });
+  });
+});
+
 describe('POST /api/v1/register', function() {
     it('should create a new user', function(done) {
       let user = {
@@ -256,7 +284,7 @@ describe('POST /api/v1/donation', function() {
 });
 
 //SAD PATH
- describe('POST /api/v1/donations', function() {
+ describe('POST /api/v1/donation', function() {
      it('should respond with a 404', function(done) {
        let user = {userName:'user fun'}
        chai.request(server)
@@ -293,36 +321,48 @@ describe('POST /api/v1/family', function() {
   });
 });
 
-// //SAD PATH
-// describe('POST /api/v1/favorites', function() {
-//     it('should respond with a 404', function(done) {
-//       let user = {userName:'user fun'}
-//       chai.request(server)
-//       .post('/api/v1/favoritess')
-//       .send(user)
-//       .end((err, res) => {
-//       expect(res).to.have.status(404);
-//       expect(res.body).to.be.a('object');
-//       done();
-//     });
-//   });
-// });
-//
-// describe('POST /api/v1/comments/:userId/:venueId', function() {
-//     it('should create a new favorite', function(done) {
-//       let favorite = {favoriteName:'favorite fun'}
-//       chai.request(server)
-//       .post('/api/v1/favorites')
-//       .send(favorite)
-//       .end((err, res) => {
-//       expect(res).to.have.status(201);
-//       expect(res).to.be.json;
-//       expect(res.body).to.be.a('array');
-//       done();
-//     });
-//   });
-// });
-//
+//SAD PATH
+describe('POST /api/v1/family', function() {
+    it('should respond with a 404', function(done) {
+      let family = {
+        expiration: '09/01/2017',
+        location:'Denver',
+        name: 'The Belchers',
+        title:'Lets buy a baby',
+        cost: 20000,
+        userId: 1
+      }
+      chai.request(server)
+      .post('/api/v1/familys')
+      .send(family)
+      .end((err, res) => {
+      expect(res).to.have.status(404);
+      expect(res.body).to.be.a('object');
+      done();
+    });
+  });
+});
+
+describe('POST /api/v1/comments', function() {
+    it.only('should create a new comment', function(done) {
+      let comment = {
+        body:'This is a neato comment',
+        familyId: 2,
+        userId: 1,
+      }
+      chai.request(server)
+      .post('/api/v1/comments')
+      .send(comment)
+      .end((err, res) => {
+      expect(res).to.have.status(201);
+      expect(res).to.be.json;
+      expect(res.body).to.be.a('array');
+      expect(res.body).to.have.length(3);
+      done();
+    });
+  });
+});
+
 // //SAD PATH
 // describe('POST /api/v1/comments/:userId/:venueId', function() {
 //     it('should respond with a 404', function(done) {
