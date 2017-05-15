@@ -245,14 +245,12 @@ let upload = multer({
     region: 'us-west-2',
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: (req, file, cb) => {
-      console.log(file);
       cb(null, Date.now().toString() + file.originalname)
     }
   })
 })
+
 app.post('/api/v1/family/pic/', upload.single('file'), (request, response) => {
-  console.log("/pic");
-  console.log(request.file)
   response.send(JSON.stringify({url: request.file.location}))
 })
 
