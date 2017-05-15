@@ -132,7 +132,7 @@ app.get('/api/v1/family/all', (request, response) => {
 
 app.get('/api/v1/myFamily/:userId', (request, response) => {
   const {userId} = request.params
-  
+
   database('family').where('userId', userId).select()
   .then(family => {
     response.status(200).json(family)
@@ -231,33 +231,27 @@ app.post('/api/v1/family', (request, response) => {
   })
 })
 
-app.post('/api/v1/family/pic/', (request, response) => {
-  let s3 = new aws.S3({
+let s3 = new aws.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: 'us-west-2'
 });
-
-  const fileName = request.query['file-name']
-  const fileType = request.query['file-type']
-  const s3Params = {
-    Bucket: 'adoptfund1',
-    Key: fileName,
-    Expires: 60,
-    ContentType: fileType,
-    ACL: 'public-read'
-  }
-  s3.getSignedUrl('putObject', s3Params, (err, data) => {
-    if(err){
-      console.log(err);
-      return response.end();
+let multer = require('multer')
+let multerS3 = require('multer-s3')
+let upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'adopt-fund',
+    region: 'us-west-2',
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: (req, file, cb) => {
+      cb(null, Date.now().toString() + file.originalname)
     }
-    const returnData = {
-      signedRequest: data,
-      url: `https://adoptfund1.s3.amazonaws.com/${fileName}`
-    };
-    response.write(JSON.stringify(returnData));
-    response.end();
-  });
+  })
+})
+
+app.post('/api/v1/family/pic/', upload.single('file'), (request, response) => {
+  response.send(JSON.stringify({url: request.file.location}))
 })
 
 app.post('/api/v1/donation', (request, response) => {
